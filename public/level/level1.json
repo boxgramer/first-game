@@ -1,0 +1,46 @@
+{
+  "portal": {
+    "x": 200,
+    "y": 200
+  },
+  "obstacles": [
+    {
+      "points": [100, 100, 300, 100, 300, 200, 100, 200, 100, 100],
+      "name": "obstacle1"
+    }
+  ],
+  "blackHoles": [
+    {
+      "x": 100,
+      "y": 500,
+      "radius": 50,
+      "type": "twister"
+    },
+    {
+      "x": 300,
+      "y": 700,
+      "radius": 50,
+      "type": "portal"
+    }
+  ],
+  "meteors": [
+    {
+      "x": 300,
+      "y": 600,
+      "radius": 20
+    }
+  ],
+  "player": {
+    "x": 200,
+    "y": 1100,
+    "direction": -90
+  },
+  "world": {
+    "width": 800,
+    "height": 1200
+  },
+  "level": {
+    "title": "Level 1",
+    "healt": 3
+  }
+}
