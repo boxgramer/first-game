@@ -10,11 +10,11 @@ export default class Obstacle {
     isGlow: boolean = false;
     name: string;
 
-    constructor(scene: Phaser.Scene, points: Array<number>, name: string = 'obstacle', isGlow: boolean = false) {
+    constructor(scene: Phaser.Scene, points: Array<number>, worldWidth: number, worldHeight: number, name: string = 'obstacle', isGlow: boolean = false) {
         this.scene = scene;
         this.name = name;
 
-        this.polygon = new Phaser.Geom.Polygon(points);
+        this.polygon = new Phaser.Geom.Polygon(this.convertPoint(points, worldWidth, worldHeight));
         this.graphics = this.scene.add.graphics();
         this.graphics.setDepth(1);
         this.fx = this.graphics.postFX.addGlow(0xA0E7E5, 0, 0, false, 0.1, 24);
@@ -23,6 +23,32 @@ export default class Obstacle {
     destroy() {
         this.graphics.destroy();
     }
+
+    convertPoint(points: Array<number>, worldWidth: number, worldHeight: number) {
+
+
+        for (let i = 0; i < points.length; i++) {
+
+            if ((i + 1) % 2 == 0) {
+                //point y
+                points[i] = worldHeight * (points[i] / 100);
+
+            } else {
+                // pont x 
+                points[i] = worldWidth * (points[i] / 100);
+
+            }
+        }
+        return points;
+    }
+
+
+
+
+
+
+
+
 
     setGlow(value: boolean) {
         this.isGlow = value;

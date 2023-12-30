@@ -7,8 +7,11 @@ import MainMenu from './MainMenu'
 const config: Phaser.Types.Core.GameConfig = {
 	type: Phaser.AUTO,
 	parent: 'app',
-	width: 800,
-	height: 700,
+	scale: {
+		mode: Phaser.Scale.RESIZE,
+	},
+	// width: 800,
+	// height: 700,
 	physics: {
 		default: 'arcade',
 		arcade: {

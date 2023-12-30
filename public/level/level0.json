@@ -1,0 +1,31 @@
+{
+  "player": {
+    "x": 50,
+    "y": 90,
+    "direction": -90
+  },
+  "world": {
+    "width": 100,
+    "height": 100,
+    "scale": 3
+  },
+  "level": {
+    "title": "Tutorial "
+  },
+  "obstacles": [
+    {
+      "points": [50, 50, 75, 50, 75, 75, 50, 75],
+      "name": "obstacle1"
+    }
+  ],
+  "blackHoles": [
+    {
+      "x": 30,
+      "y": 70,
+      "radius": 50,
+      "type": "portal"
+    }
+  ],
+  "meteors": [],
+  "stars": []
+}

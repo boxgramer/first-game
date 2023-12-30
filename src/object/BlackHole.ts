@@ -34,7 +34,6 @@ export default class BlackHole extends Phaser.GameObjects.Image {
         if (this.type != 'portal')
             return;
 
-        console.log("open portal")
         this.setActive(true);
         this.setVisible(true);
         let scale = this.defaultScale;
@@ -52,7 +51,6 @@ export default class BlackHole extends Phaser.GameObjects.Image {
         if (this.type != 'portal')
             return;
 
-        console.log("close portal")
         this.scene.tweens.add({
             targets: this,
             scale: 0,

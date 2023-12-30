@@ -90,7 +90,6 @@ export default class LoseGUI extends Phaser.Scene {
 
     }
     setActive(value: boolean) {
-        console.log('print set active')
         this.scene.setActive(value, this)
         this.scene.setVisible(value, this)
     }

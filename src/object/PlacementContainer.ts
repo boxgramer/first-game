@@ -31,7 +31,6 @@ export default class PlacementContainer {
         for (let i = 0; i < this.placements.length; i++) {
 
 
-            console.log(this.placements[i].collected, type, " out placement")
             if (this.placements[i].collected == type) {
 
                 return null;

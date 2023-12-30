@@ -37,6 +37,8 @@ export default class Gameplay extends Phaser.Scene {
     dataLevel: any;
 
     loseGuiScene: Phaser.Scene | null = null;
+    width: number = 0.0;
+    height: number = 0.0;
 
     constructor() {
         super(
@@ -57,12 +59,21 @@ export default class Gameplay extends Phaser.Scene {
         this.load.image('syellow', 'assets/stone-yellow.png');
         this.load.image('placement', 'assets/meteor-placement.png');
 
+
+        this.load.json('level0', 'level/level0.json');
         this.load.json('level1', 'level/level1.json');
     }
 
     init(data: any) {
         this.lives = data.lives != undefined ? data.lives : 3;
 
+    }
+    // percent value
+    convertX(value: number) {
+        return this.width * (value / 100);
+    }
+    convertY(value: number) {
+        return this.height * (value / 100);
     }
     create() {
 
@@ -76,13 +87,16 @@ export default class Gameplay extends Phaser.Scene {
         this.bigBlackHole = null;
         this.setupHealth(this.lives)
 
-        this.dataLevel = this.cache.json.get('level1');
+        this.dataLevel = this.cache.json.get('level0');
+
+        this.width = this.sys.game.scale.gameSize.width;
+        this.height = this.sys.game.scale.gameSize.height * this.dataLevel.world.scale;
 
 
 
 
 
-        this.placementContainer = new PlacementContainer(this, 400, 70)
+        this.placementContainer = new PlacementContainer(this, this.width / 2, this.height * 0.025)
 
         this.setupStar()
 
@@ -91,15 +105,14 @@ export default class Gameplay extends Phaser.Scene {
         this.setupMeteors(this.dataLevel.meteors);
         this.setupStars(this.dataLevel.stars);
 
-        this.add.text(this.dataLevel.world.width / 2 - 50, 20, this.dataLevel.level.title, { fontSize: 20, align: 'center', fontFamily: 'painter', color: '#dfd8c8' }).setDepth(10).setScrollFactor(0);
-        this.ship = new Ship(this, new Phaser.Math.Vector2(this.dataLevel.player.x, this.dataLevel.player.y), 10, this.dataLevel.world.width, this.dataLevel.world.height);
+        this.add.text(this.width / 2 - 50, 20, this.dataLevel.level.title, { fontSize: 20, align: 'center', fontFamily: 'painter', color: '#dfd8c8' }).setDepth(10).setScrollFactor(0);
+        this.ship = new Ship(this, new Phaser.Math.Vector2(this.convertX(this.dataLevel.player.x), this.convertY(this.dataLevel.player.y)), 10, this.width, this.height);
 
         this.ship.placementContainer = this.placementContainer
         this.ship.onHit = () => {
             this.lives -= 1;
             this.setupHealth(this.lives)
             this.ship.setToStart()
-            console.log('on hit')
         }
 
         this.ship.onHitPortal = () => {
@@ -119,8 +132,11 @@ export default class Gameplay extends Phaser.Scene {
         this.line.start();
 
         this.setupCamera();
-        this.minimap = new MiniMap(this, this.dataLevel)
+        this.minimap = new MiniMap(this, this.dataLevel, this.width, this.height)
         this.minimap.meteors = this.meteors;
+        this.minimap.blackHoles = this.twisters;
+        this.minimap.stars = this.stars;
+
         this.minimap.addShip(this.ship);
 
         // var textBox = new TextBox(this, 400, 800)
@@ -163,7 +179,6 @@ export default class Gameplay extends Phaser.Scene {
             twister.update();
         })
         if (this.isGameOver) {
-            console.log('is game over');
             if (this.isWin) {
                 if (!this.isEnding) {
 
@@ -212,12 +227,10 @@ export default class Gameplay extends Phaser.Scene {
         this.isGameOver = this.calculateGameOver();
 
         if (this.isWin && !this.isOpenPortal) {
-            console.log("is Win")
             this.openPortal()
             this.isOpenPortal = true;
         }
         if (!this.isWin && this.isOpenPortal) {
-            console.log('is lose')
             this.closePortal()
             this.isOpenPortal = false;
         }
@@ -237,14 +250,14 @@ export default class Gameplay extends Phaser.Scene {
         this.meteors = []
     }
     setupCamera() {
-        this.cameras.main.setBounds(0, 0, this.dataLevel.world.width, this.dataLevel.world.height).setName('main');
+        this.cameras.main.setBounds(0, 0, this.width, this.height).setName('main');
         this.cameras.main.setRoundPixels(true);
         this.cameras.main.startFollow(this.ship);
     }
 
     setupObstacle(obstacles: Array<any>) {
         obstacles.forEach(ob => {
-            const obstacle = new Obstacle(this, ob.points, ob.name, false);
+            const obstacle = new Obstacle(this, ob.points, this.width, this.height, ob.name, false);
             this.obstacles.push(obstacle);
         })
     }
@@ -267,7 +280,7 @@ export default class Gameplay extends Phaser.Scene {
     setupTwister(blackHole: Array<any>) {
 
         blackHole.forEach(b => {
-            const blackHole = new BlackHole(this, b.x, b.y, b.type);
+            const blackHole = new BlackHole(this, this.convertX(b.x), this.convertY(b.y), b.type);
 
             this.twisters.push(blackHole);
         })
@@ -276,14 +289,14 @@ export default class Gameplay extends Phaser.Scene {
     }
     setupMeteors(meteor: Array<any>) {
         meteor.forEach(m => {
-            const metorit = new Meteor(this, m.x, m.y, m.radius)
+            const metorit = new Meteor(this, this.convertX(m.x), this.convertY(m.y), m.radius)
             this.meteors.push(metorit)
 
         })
     }
     setupStars(stars: Array<any>) {
         stars.forEach(s => {
-            const star = new Star(this, s.x, s.y, s.type);
+            const star = new Star(this, this.convertX(s.x), this.convertY(s.y), s.type);
             this.stars.push(star)
         })
     }
@@ -309,12 +322,12 @@ export default class Gameplay extends Phaser.Scene {
         }
     }
     setupStar() {
-        const star = this.add.image(Phaser.Math.Between(0, this.dataLevel.world.width), Phaser.Math.Between(0, this.dataLevel.world.height), 'star').setVisible(false)
-        const rt = this.add.renderTexture(this.dataLevel.world.width / 2, this.dataLevel.world.height / 2, this.dataLevel.world.width, this.dataLevel.world.height)
+        const star = this.add.image(Phaser.Math.Between(0, this.width), Phaser.Math.Between(0, this.height), 'star').setVisible(false)
+        const rt = this.add.renderTexture(this.width / 2, this.height / 2, this.width, this.height)
         rt.setDepth(0)
-        for (let i = 0; i < 50; i++) {
-            const x = Phaser.Math.Between(0, this.dataLevel.world.width)
-            const y = Phaser.Math.Between(0, this.dataLevel.world.height)
+        for (let i = 0; i < 100; i++) {
+            const x = Phaser.Math.Between(0, this.width)
+            const y = Phaser.Math.Between(0, this.height)
             star.setScale(Phaser.Math.Between(1, 5) / 100)
             rt.draw(star, x, y)
 

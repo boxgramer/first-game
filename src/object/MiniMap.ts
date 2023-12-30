@@ -2,34 +2,45 @@
 import Phaser from "phaser";
 import Ship from "./Ship";
 import Meteor from "./Meteor";
+import Obstacle from "./Obstacle";
+import BlackHole from "./BlackHole";
+import Star from "./star";
 export default class MiniMap extends Phaser.GameObjects.Graphics {
     x: number = 0;
     y: number = 0;
     width: number = 100;
     height: number = 100;
+    worldWidth: number = 0;
+    worldHeight: number = 0;
     dataLevel: any;
     obstacles: Array<Phaser.Geom.Polygon> = []
-    blackHoles: Array<any> = []
+    blackHoles: Array<BlackHole> = []
     meteors: Array<Meteor> = []
+    stars: Array<Star> = []
 
     ship: Ship | null = null;
     isWin: boolean = false;
-
-
-    constructor(scene: Phaser.Scene, dataLevel: any) {
+    widthCamera: number = 0;
+    heightCamera: number = 0;
+    constructor(scene: Phaser.Scene, dataLevel: any, worldWidth: number, worldHeight: number) {
         super(scene);
         this.scene.add.existing(this);
         this.dataLevel = dataLevel;
         this.setScrollFactor(0);
         this.setDepth(10);
+        this.widthCamera = this.scene.sys.game.scale.gameSize.width;
+        this.heightCamera = this.scene.sys.game.scale.gameSize.height;
+        this.worldWidth = worldWidth;
+        this.worldHeight = worldHeight;
 
-        this.width = this.dataLevel.world.width * 0.2;
-        this.height = this.dataLevel.world.height * 0.1;
-        this.x = (this.dataLevel.world.width / 2) - ((this.width / 2) + 5)
+
+        this.width = this.heightCamera * 0.2;
+        this.height = this.heightCamera * 0.3;
+        this.x = (this.widthCamera / 2) - ((this.width / 2) + 5)
         this.y = 5;
 
         this.setupObstacle();
-        this.setupBlackHoles();
+        // this.setupBlackHoles();
     }
 
     addShip(ship: Ship) {
@@ -66,6 +77,32 @@ export default class MiniMap extends Phaser.GameObjects.Graphics {
                 this.fillCircle(this.convertX(m.x), this.convertY(m.y), 5)
             }
         })
+        this.stars.forEach(s => {
+            if (!s.isHit) {
+                if (s.type == 'sblue') {
+                    //c8e8ed
+                    this.fillStyle(0xc8e8ed)
+                }
+                if (s.type == 'sbrown') {
+                    // 625757
+                    this.fillStyle(0x625757)
+                }
+                if (s.type == 'sgreen') {
+                    // 7ed3b2
+                    this.fillStyle(0x7ed3b2)
+                }
+                if (s.type == 'sred') {
+                    // ef6c57
+                    this.fillStyle(0xef6c57)
+                }
+                if (s.type == 'syellow') {
+                    // f7fdb1
+
+                    this.fillStyle(0xf7fdb1)
+                }
+                this.fillCircle(this.convertX(s.x), this.convertY(s.y), 5)
+            }
+        })
     }
     setupObstacle() {
         this.dataLevel.obstacles.forEach((ob: any) => {
@@ -75,27 +112,20 @@ export default class MiniMap extends Phaser.GameObjects.Graphics {
                     points.push(this.convertY(p))
                 } else {
                     points.push(this.convertX(p))
+
                 }
+
 
             })
             this.obstacles.push(new Phaser.Geom.Polygon(points));
         })
 
     }
-    setupBlackHoles() {
-        this.dataLevel.blackHoles.forEach((bh: any) => {
-            this.blackHoles.push({
-                x: bh.x,
-                y: bh.y,
-                redius: bh.radius,
-                type: bh.type
-            })
-        });
-    }
+
     convertX(value: number) {
-        return this.x + ((value / this.dataLevel.world.width) * this.width);
+        return this.x + ((value / this.worldWidth) * this.width);
     }
     convertY(value: number) {
-        return this.y + ((value / this.dataLevel.world.height) * this.height);
+        return this.y + ((value / this.worldHeight) * this.height);
     }
 }

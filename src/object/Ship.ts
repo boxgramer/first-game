@@ -223,7 +223,6 @@ export default class Ship extends Phaser.GameObjects.Sprite {
 
                 if (isHit) {
                     let placement = this.getPlacement(star.type);
-                    console.log("placement", placement?.collected)
                     if (placement != null) {
                         star.isHit = true;
                         star.collect(new Phaser.Math.Vector2(placement.x, placement.y))
