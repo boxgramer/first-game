@@ -2,9 +2,12 @@ import Phaser, { Tweens } from "phaser";
 import Obstacle from "./Obstacle";
 import BlackHole from "./BlackHole";
 import Meteor from "./Meteor";
+import Star from "./star";
+import PlacementContainer from "./PlacementContainer";
 
 export default class Ship extends Phaser.GameObjects.Sprite {
 
+    placementContainer: PlacementContainer | null = null;
     startPosition: Phaser.Math.Vector2 = Phaser.Math.Vector2.ZERO
     point: Phaser.Math.Vector2;
     velocity: Phaser.Math.Vector2 = Phaser.Math.Vector2.ZERO;
@@ -204,9 +207,33 @@ export default class Ship extends Phaser.GameObjects.Sprite {
         })
         emitter.explode(40);
     }
-    setupFire() {
+    getPlacement(starType: string) {
+        if (this.placementContainer == null) {
+            return null;
+        }
+        return this.placementContainer.getEmptyPlacement(starType);
+
+
 
     }
+    collideWithStar(stars: Array<Star>) {
+        stars.forEach(star => {
+            if (!star.isHit) {
+                let isHit = this.collideWithCircle(star.circle)
+
+                if (isHit) {
+                    let placement = this.getPlacement(star.type);
+                    console.log("placement", placement?.collected)
+                    if (placement != null) {
+                        star.isHit = true;
+                        star.collect(new Phaser.Math.Vector2(placement.x, placement.y))
+                    }
+                }
+            }
+
+        })
+    }
+
     collideWithMeteors(meteors: Array<Meteor>) {
         if (this.isHit) {
             return

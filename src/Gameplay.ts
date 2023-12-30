@@ -6,6 +6,8 @@ import BigBlackHole from "./object/BigBlackHole";
 import MiniMap from "./object/MiniMap";
 import Meteor from "./object/Meteor";
 import TextBox from "./object/TextBox";
+import Star from "./object/star";
+import PlacementContainer from "./object/PlacementContainer";
 
 
 export default class Gameplay extends Phaser.Scene {
@@ -17,6 +19,8 @@ export default class Gameplay extends Phaser.Scene {
     graphic!: Phaser.GameObjects.Graphics;
     twisters: Array<BlackHole> = [];
     meteors: Array<Meteor> = [];
+    stars: Array<Star> = [];
+    placementContainer: PlacementContainer | null = null;
     bigBlackHole: BigBlackHole | null = null;
     healthImages: Array<Phaser.GameObjects.Image> = []
     minimap!: MiniMap;
@@ -46,6 +50,13 @@ export default class Gameplay extends Phaser.Scene {
         this.load.image('portal', 'assets/tornado_portal.png');
         this.load.image('ship', 'assets/cryon_ship.png');
         this.load.image('health', 'assets/health.png');
+        this.load.image('sblue', 'assets/stone-blue.png');
+        this.load.image('sbrown', 'assets/stone-brown.png');
+        this.load.image('sgreen', 'assets/stone-green.png');
+        this.load.image('sred', 'assets/stone-red.png');
+        this.load.image('syellow', 'assets/stone-yellow.png');
+        this.load.image('placement', 'assets/meteor-placement.png');
+
         this.load.json('level1', 'level/level1.json');
     }
 
@@ -71,15 +82,19 @@ export default class Gameplay extends Phaser.Scene {
 
 
 
+        this.placementContainer = new PlacementContainer(this, 400, 70)
+
         this.setupStar()
 
         this.setupTwister(this.dataLevel.blackHoles);
         this.setupObstacle(this.dataLevel.obstacles);
         this.setupMeteors(this.dataLevel.meteors);
+        this.setupStars(this.dataLevel.stars);
 
         this.add.text(this.dataLevel.world.width / 2 - 50, 20, this.dataLevel.level.title, { fontSize: 20, align: 'center', fontFamily: 'painter', color: '#dfd8c8' }).setDepth(10).setScrollFactor(0);
         this.ship = new Ship(this, new Phaser.Math.Vector2(this.dataLevel.player.x, this.dataLevel.player.y), 10, this.dataLevel.world.width, this.dataLevel.world.height);
 
+        this.ship.placementContainer = this.placementContainer
         this.ship.onHit = () => {
             this.lives -= 1;
             this.setupHealth(this.lives)
@@ -108,8 +123,9 @@ export default class Gameplay extends Phaser.Scene {
         this.minimap.meteors = this.meteors;
         this.minimap.addShip(this.ship);
 
-        var textBox = new TextBox(this, 400, 800)
-        textBox.typingText("Agus", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis ornare ac felis eu maximus. Vestibulum non odio ipsum. Fusce placerat placerat lorem. Aliquam lacinia justo nec ligula suscipit sagittis. Mauris vitae lectus vitae nibh semper sodales. Vestibulum massa tellus, eleifend id tortor ac, mollis tempor nisl. Vivamus iaculis ex non lectus suscipit, scelerisque cursus velit rutrum. Nullam eget varius augue, efficitur lobortis est. Praesent at scelerisque quam. In hac habitasse platea dictumst. Aliquam faucibus dolor dignissim augue venenatis, non dictum orci posuere. Vestibulum maximus ex urna, id sodales tellus venenatis volutpat.")
+        // var textBox = new TextBox(this, 400, 800)
+        // textBox.typingText("Agus", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis ornare ac felis eu maximus. Vestibulum non odio ipsum. Fusce placerat placerat lorem. Aliquam lacinia justo nec ligula suscipit sagittis. Mauris vitae lectus vitae nibh semper sodales. Vestibulum massa tellus, eleifend id tortor ac, mollis tempor nisl. Vivamus iaculis ex non lectus suscipit, scelerisque cursus velit rutrum. Nullam eget varius augue, efficitur lobortis est. Praesent at scelerisque quam. In hac habitasse platea dictumst. Aliquam faucibus dolor dignissim augue venenatis, non dictum orci posuere. Vestibulum maximus ex urna, id sodales tellus venenatis volutpat.")
+
     }
     loseCondition() {
 
@@ -178,13 +194,16 @@ export default class Gameplay extends Phaser.Scene {
         this.ship.colideWithObstacles(this.obstacles)
         this.ship.collideWithBlackHole(this.twisters)
         this.ship.collideWithMeteors(this.meteors)
+        this.ship.collideWithStar(this.stars)
 
         this.ship.update(time, delta);
         this.line.update();
         this.obstacles.forEach(obstacles => {
             obstacles.update();
         })
-
+        this.stars.forEach(s => {
+            s.update();
+        })
 
 
 
@@ -228,7 +247,6 @@ export default class Gameplay extends Phaser.Scene {
             const obstacle = new Obstacle(this, ob.points, ob.name, false);
             this.obstacles.push(obstacle);
         })
-
     }
     openPortal() {
         this.twisters.forEach(blackHole => {
@@ -261,6 +279,12 @@ export default class Gameplay extends Phaser.Scene {
             const metorit = new Meteor(this, m.x, m.y, m.radius)
             this.meteors.push(metorit)
 
+        })
+    }
+    setupStars(stars: Array<any>) {
+        stars.forEach(s => {
+            const star = new Star(this, s.x, s.y, s.type);
+            this.stars.push(star)
         })
     }
     removeAllHealtImage() {
