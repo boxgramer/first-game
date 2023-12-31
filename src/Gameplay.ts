@@ -96,7 +96,7 @@ export default class Gameplay extends Phaser.Scene {
 
 
 
-        this.placementContainer = new PlacementContainer(this, this.width / 2, this.height * 0.025)
+        this.placementContainer = new PlacementContainer(this, this.width / 2, 80)
 
         this.setupStar()
 

@@ -34,8 +34,8 @@ export default class MiniMap extends Phaser.GameObjects.Graphics {
         this.worldHeight = worldHeight;
 
 
-        this.width = this.heightCamera * 0.2;
-        this.height = this.heightCamera * 0.3;
+        this.width = this.worldWidth * 0.1;
+        this.height = this.worldHeight * 0.1;
         this.x = (this.widthCamera / 2) - ((this.width / 2) + 5)
         this.y = 5;
 

@@ -327,7 +327,7 @@ export default class Ship extends Phaser.GameObjects.Sprite {
         this.direction = this.velocity.angle();
     }
     getLineFromPoint(points: Phaser.Geom.Point[]) {
-        for (let i = 0; i < points.length; i++) {
+        for (let i = 0; i < points.length - 1; i++) {
             let nextIndex = (i + 1) % points.length;
             if (this.colideWithLine(
                 new Phaser.Geom.Line(points[i].x, points[i].y,
