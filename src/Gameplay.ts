@@ -328,10 +328,9 @@ export default class Gameplay extends Phaser.Scene {
         let space = 30;
         for (let i = 0; i < countLive; i++) {
             let image = this.add.image(startPosX, startPosY, 'health')
-            image.setTintFill(0xffffff)
             image.setDepth(10)
             image.setScrollFactor(0)
-            image.setScale(0.03)
+            image.setScale(0.13)
             this.healthImages.push(image);
             startPosX += space;
         }
