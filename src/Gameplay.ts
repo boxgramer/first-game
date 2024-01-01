@@ -139,7 +139,6 @@ export default class Gameplay extends Phaser.Scene {
         this.minimap.stars = this.stars;
 
         this.minimap.addShip(this.ship);
-
         this.setupTextBox();
 
 

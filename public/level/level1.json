@@ -51,5 +51,6 @@
   "level": {
     "title": "Level 1",
     "healt": 3
-  }
+  },
+  "textboxs": []
 }

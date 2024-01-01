@@ -12,11 +12,13 @@ export default class TextBox extends Phaser.GameObjects.Container {
     targetWho: string = '';
     index: number = 0;
     bg: Phaser.GameObjects.Image;
+    canNext: boolean = true;
+    onEndTextbox: () => void = () => { }
 
 
 
 
-    constructor(scene: Phaser.Scene, x: number, y: number, targetText: Array<string>, targetWho: string) {
+    constructor(scene: Phaser.Scene, x: number, y: number, targetText: Array<string>, targetWho: string, onEndTextBox: () => void) {
         super(scene, x, y)
 
 
@@ -41,6 +43,7 @@ export default class TextBox extends Phaser.GameObjects.Container {
         }).setOrigin(0);
 
         this.add([this.bg, this.whoSaid, this.text]);
+        this.onEndTextbox = onEndTextBox;
 
 
         this.targetTexts = targetText;
@@ -55,6 +58,10 @@ export default class TextBox extends Phaser.GameObjects.Container {
         //         }
         //     })
 
+        this.bg.setInteractive().on('pointerdown', () => {
+            this.startTyping(this.index)
+
+        })
 
     }
     update() {
@@ -68,7 +75,8 @@ export default class TextBox extends Phaser.GameObjects.Container {
 
 
 
-        if (this.index >= this.targetTexts.length) {
+        if (!this.canNext || this.index >= this.targetTexts.length) {
+            this.onEndTextbox();
             return;
         }
 
@@ -89,12 +97,12 @@ export default class TextBox extends Phaser.GameObjects.Container {
         this.whoSaid.text = who;
         this.text.text = text.substring(0, i);
 
+        this.canNext = false;
 
         this.scene.time.addEvent({
             callback: () => {
                 this.text.text = text.substring(0, i);
 
-                console.log(this.index, this.targetTexts.length, this.text.text)
                 i++;
                 width++;
                 if (width >= this.maxCharWidth) {
@@ -106,6 +114,9 @@ export default class TextBox extends Phaser.GameObjects.Container {
                 }
 
 
+                if (i >= text.length) {
+                    this.canNext = true;
+                }
 
             },
             repeat: textLength - 1,

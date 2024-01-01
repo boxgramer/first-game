@@ -26,7 +26,7 @@ export default class TextBoxScene extends Phaser.Scene {
         this.width = this.sys.game.scale.gameSize.width;
         this.height = this.sys.game.scale.gameSize.height;
 
-        this.startPoint = new Phaser.Math.Vector2(this.width * 0.5, this.height * 0.2);
+        this.startPoint = new Phaser.Math.Vector2(this.width * 0.5, this.height * 1.8);
         this.targetPoint = new Phaser.Math.Vector2(this.width * 0.5, this.height * 0.8);
 
         this.texts = this.dataLevel.textboxs;
@@ -49,7 +49,11 @@ export default class TextBoxScene extends Phaser.Scene {
         this.currentTextBox = new TextBox(this, this.startPoint.x,
             this.startPoint.y,
             this.texts[this.index].texts,
-            this.texts[this.index].who);
+            this.texts[this.index].who, () => {
+                this.hideTextBox(this.onEnd, () => {
+                    this.showTextBox()
+                })
+            });
 
         this.tweens.add({
             targets: this.currentTextBox,
@@ -64,7 +68,8 @@ export default class TextBoxScene extends Phaser.Scene {
             })
         this.index += 1;
     }
-    hideTextBox(callback: () => void) {
+    hideTextBox(callbackStart: () => void, callbackEnd: () => void) {
+
         this.tweens.add({
             targets: this.currentTextBox,
             x: this.startPoint.x,
@@ -72,7 +77,8 @@ export default class TextBoxScene extends Phaser.Scene {
             duration: 500,
             repeat: 0,
             ease: Phaser.Math.Easing.Sine.In,
-        }).on('start', callback)
+        }).on('start', callbackStart)
+            .on('complete', callbackEnd)
     }
 
 } 
