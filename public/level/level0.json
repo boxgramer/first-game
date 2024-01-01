@@ -27,5 +27,21 @@
     }
   ],
   "meteors": [],
-  "stars": []
+  "stars": [],
+  "textboxs": [
+    {
+      "who": "Agus",
+      "texts": [
+        " text 1  agus  lorem ipsum 1 ? ",
+        " agus text 2  lorem ipsum 2 ? "
+      ]
+    },
+    {
+      "who": "Rimba",
+      "texts": [
+        " text rimba  1  lorem ipsum rimba  1 ? ",
+        " text rimba  2 rimba  lorem ipsum 2 ? "
+      ]
+    }
+  ]
 }

@@ -1,32 +1,50 @@
 import Phaser, { GameObjects } from "phaser";
 
-export default class TextBox extends Phaser.GameObjects.Image {
+export default class TextBox extends Phaser.GameObjects.Container {
 
+    graphics: Phaser.GameObjects.Graphics;
     text: Phaser.GameObjects.Text;
     whoSaid: Phaser.GameObjects.Text;
     maxCharWidth: number = 40;
     maxCharLine: number = 5;
 
-    constructor(scene: Phaser.Scene, x: number, y: number) {
-        super(scene, x, y, 'textbox')
-        this.setScale(0.3)
+    targetTexts: Array<string> = [];
+    targetWho: string = '';
+    index: number = 0;
+    bg: Phaser.GameObjects.Image;
+
+
+
+
+    constructor(scene: Phaser.Scene, x: number, y: number, targetText: Array<string>, targetWho: string) {
+        super(scene, x, y)
+
 
         this.scene.add.existing(this)
-        this.whoSaid = this.scene.add.text(this.getTopLeft().x! + 40, this.getTopLeft().y! + 3, "Agus", {
+        this.bg = this.scene.add.image(0, 0, 'textbox');
+        this.bg.setScale(0.3)
+        this.whoSaid = this.scene.add.text(this.bg.getTopLeft().x! + 40, this.bg.getTopLeft().y! + 3, "Agus", {
             fontSize: 19,
             align: "left",
             fontFamily: 'painter',
             color: '#dfd8c8',
         })
-        var mask = new Phaser.Display.Masks.GeometryMask(this.scene, this.scene.make.graphics().fillRect(this.getTopLeft().x! + 15, this.getTopLeft().y! + 38, 560, 110))
-        this.text = this.scene.add.text(this.getTopLeft().x! + 20, this.getTopLeft().y! + 40, "hellow assd asdi asdiasdisd askdjfalsdjf askdjfksdjfls djflasdjf lasjdflsjdfljsldjflskdjf jsdlfjlsjdfsdf asd a alsdjf asdfoisaduf osdufo asdfuou oasidufosdhf asdiufoasdfsdifskljfl sdf0iasdfpsdipa sdia aisdujpasid ap apsdiuaposiduapodiu paoisdu apoisdupaosdupaoisdu asd woldl asdjfa;lsdjf a;lsdjf asldjf;lasdjfa;lsdjf;alsdjf;a dsjf;lajs df;al ", {
+        this.graphics = this.scene.make.graphics();
+
+
+        this.text = this.scene.add.text(this.bg.getTopLeft().x! + 20, this.bg.getTopLeft().y! + 40, "", {
             fontSize: 20,
             align: "left",
             fontFamily: 'painter',
             color: '#dfd8c8',
             wordWrap: { width: 550, useAdvancedWrap: true }
-        }).setOrigin(0)
-            .setMask(mask);
+        }).setOrigin(0);
+
+        this.add([this.bg, this.whoSaid, this.text]);
+
+
+        this.targetTexts = targetText;
+        this.targetWho = targetWho;
 
         // this.scene.add.zone(this.getTopLeft().x! + 15, this.getTopLeft().y! + 38, 560, 110)
         //     .setInteractive()
@@ -39,6 +57,29 @@ export default class TextBox extends Phaser.GameObjects.Image {
 
 
     }
+    update() {
+        this.graphics.clear();
+        this.graphics.fillRect(this.x - 270, this.y - 45, 543, 110);
+
+
+    }
+    startTyping(index: number = 0) {
+        this.index = index;
+
+
+
+        if (this.index >= this.targetTexts.length) {
+            return;
+        }
+
+        var mask = new Phaser.Display.Masks.GeometryMask(this.scene, this.graphics)
+        this.text.setMask(mask);
+
+        this.typingText(this.targetWho, this.targetTexts[this.index]);
+
+        this.index += 1;
+
+    }
 
     typingText(who: string, text: string) {
         let i = 0;
@@ -48,9 +89,12 @@ export default class TextBox extends Phaser.GameObjects.Image {
         this.whoSaid.text = who;
         this.text.text = text.substring(0, i);
 
+
         this.scene.time.addEvent({
             callback: () => {
                 this.text.text = text.substring(0, i);
+
+                console.log(this.index, this.targetTexts.length, this.text.text)
                 i++;
                 width++;
                 if (width >= this.maxCharWidth) {

@@ -36,6 +36,7 @@ export default class Gameplay extends Phaser.Scene {
     level: string = 'level 1';
     dataLevel: any;
 
+    textBoxScene: Phaser.Scene | null = null;
     loseGuiScene: Phaser.Scene | null = null;
     width: number = 0.0;
     height: number = 0.0;
@@ -139,9 +140,24 @@ export default class Gameplay extends Phaser.Scene {
 
         this.minimap.addShip(this.ship);
 
+        this.setupTextBox();
+
+
         // var textBox = new TextBox(this, 400, 800)
         // textBox.typingText("Agus", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis ornare ac felis eu maximus. Vestibulum non odio ipsum. Fusce placerat placerat lorem. Aliquam lacinia justo nec ligula suscipit sagittis. Mauris vitae lectus vitae nibh semper sodales. Vestibulum massa tellus, eleifend id tortor ac, mollis tempor nisl. Vivamus iaculis ex non lectus suscipit, scelerisque cursus velit rutrum. Nullam eget varius augue, efficitur lobortis est. Praesent at scelerisque quam. In hac habitasse platea dictumst. Aliquam faucibus dolor dignissim augue venenatis, non dictum orci posuere. Vestibulum maximus ex urna, id sodales tellus venenatis volutpat.")
 
+    }
+    setupTextBox() {
+        this.scene.launch('textboxscene', {
+            'dataLevel': this.dataLevel,
+            'onStart': () => {
+                this.scene.setActive(false, this);
+            },
+            'onEnd': () => {
+                this.scene.setActive(true, this);
+            }
+        })
+        this.textBoxScene = this.scene.get('textboxscene')
     }
     loseCondition() {
 

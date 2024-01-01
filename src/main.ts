@@ -3,6 +3,7 @@ import Phaser from 'phaser'
 import Gameplay from './Gameplay'
 import LoseGUI from './LoseGUI'
 import MainMenu from './MainMenu'
+import TextBoxScene from './TextBoxScene'
 
 const config: Phaser.Types.Core.GameConfig = {
 	type: Phaser.AUTO,
@@ -19,7 +20,7 @@ const config: Phaser.Types.Core.GameConfig = {
 		}
 
 	},
-	scene: [MainMenu, Gameplay, LoseGUI],
+	scene: [MainMenu, Gameplay, LoseGUI, TextBoxScene],
 	render: {
 		antialias: true,
 	}
