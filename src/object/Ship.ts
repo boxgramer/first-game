@@ -29,6 +29,7 @@ export default class Ship extends Phaser.GameObjects.Sprite {
     pointTrails: any = [];
     onHit: () => void = () => { };
     onHitPortal: () => void = () => { };
+    onUpdateScore: (type: string) => void = () => { };
 
     fire: Phaser.GameObjects.Particles.ParticleEmitter | null = null;
     firePosMarginY: number = 30;
@@ -211,7 +212,7 @@ export default class Ship extends Phaser.GameObjects.Sprite {
 
         // this.drawTrail();
     }
-    addParticle(x: number, y: number) {
+    addParticle(x: number, y: number, disableScrollFactor: boolean = false) {
 
         const emitter = this.scene.add.particles(x, y, 'meteorit', {
             lifespan: 2000,
@@ -219,6 +220,9 @@ export default class Ship extends Phaser.GameObjects.Sprite {
             scale: { start: 0.05, end: 0.00 },
             emitting: false,
         })
+        if (disableScrollFactor) {
+            emitter.setScrollFactor(0)
+        }
         emitter.explode(40);
     }
     getPlacement(starType: string) {
@@ -235,16 +239,44 @@ export default class Ship extends Phaser.GameObjects.Sprite {
             if (!star.isHit) {
                 let isHit = this.collideWithCircle(star.circle)
 
+
                 if (isHit) {
+
                     let placement = this.getPlacement(star.type);
                     if (placement != null) {
                         star.isHit = true;
-                        star.collect(new Phaser.Math.Vector2(placement.x, placement.y))
+                        this.collect(star.x, star.y, new Phaser.Math.Vector2(placement.x, placement.y), star.type);
+                        star.destroy(true);
+                        this.onUpdateScore(star.type);
                     }
                 }
             }
 
         })
+    }
+    collect(_x: number, _y: number, targetPos: Phaser.Math.Vector2, type: string) {
+        const x = _x - this.scene.cameras.main.scrollX;
+        const y = _y - this.scene.cameras.main.scrollY;
+        var star = this.scene.add.image(x, y, type)
+        star.setScrollFactor(0)
+        star.setScale(0.1)
+
+
+        this.scene.tweens.add({
+            targets: star,
+            x: targetPos.x,
+            y: targetPos.y,
+            duration: 500,
+            ease: Phaser.Math.Easing.Sine.Out
+
+        }).on('complete', () => {
+            this.addParticle(targetPos.x, targetPos.y, true);
+            star.destroy(true);
+
+
+        })
+
+
     }
 
     collideWithMeteors(meteors: Array<Meteor>) {

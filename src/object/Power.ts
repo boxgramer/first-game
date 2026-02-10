@@ -21,27 +21,19 @@ export default class Power extends Phaser.GameObjects.Image {
         // this.graphics.fillCircleShape(this.circle)
     }
 
-    collect(targetPos: Phaser.Math.Vector2) {
-        const x = this.x - this.scene.cameras.main.scrollX;
-        const y = this.y - this.scene.cameras.main.scrollY;
-        var star = this.scene.add.image(x, y, this.type)
-        star.setScrollFactor(0)
-        star.setScale(this.scale)
 
-        this.scene.tweens.add({
-            targets: star,
-            x: targetPos.x,
-            y: targetPos.y,
-            duration: 500,
-            ease: Phaser.Math.Easing.Sine.Out
-
-        }).on('complete', () => {
-        })
-
-        this.destroy(true)
-    }
     convertPos(pos: Phaser.Math.Vector2) {
         return this.scene.cameras.main.getWorldPoint(pos.x, pos.y);
+    }
+
+    addParticle(x: number, y: number) {
+
+        return this.scene.add.particles(x, y, 'meteorit', {
+            lifespan: 2000,
+            speed: { min: 10, max: 150 },
+            scale: { start: 0.05, end: 0.00 },
+            emitting: false,
+        })
     }
 
 

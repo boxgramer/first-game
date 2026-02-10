@@ -30,7 +30,17 @@ export default class TextBoxScene extends Phaser.Scene {
         this.targetPoint = new Phaser.Math.Vector2(this.width * 0.5, this.height * 0.8);
 
         this.texts = this.dataLevel.textboxs;
+        this.index = 0;
 
+        this.input.on('pointerdown', (_: Phaser.Input.InputPlugin) => {
+
+
+            if (this.currentTextBox == null) return
+
+
+            this.currentTextBox?.nextTyping();
+
+        })
         this.showTextBox()
 
     }

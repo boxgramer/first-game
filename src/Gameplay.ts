@@ -9,6 +9,7 @@ import TextBox from "./object/TextBox";
 import Power from "./object/Power";
 import PlacementContainer from "./object/PlacementContainer";
 import Location, { pos } from "./utils/Location";
+import { Data } from "./utils/Data";
 
 
 export default class Gameplay extends Phaser.Scene {
@@ -26,6 +27,7 @@ export default class Gameplay extends Phaser.Scene {
     healthImages: Array<Phaser.GameObjects.Image> = []
     minimap!: MiniMap;
     location!: Location;
+    dataStorage: Data = new Data();
 
 
 
@@ -36,13 +38,14 @@ export default class Gameplay extends Phaser.Scene {
     countObstacleHit: number = 0;
     isEnding: boolean = false;
     level: string = 'level 1';
-    dataLevel: any;
 
     textBoxScene: Phaser.Scene | null = null;
     loseGuiScene: Phaser.Scene | null = null;
     width: number = 0.0;
     height: number = 0.0;
+    dataLevel: any;
 
+    scoreText: Phaser.GameObjects.Text | null = null;
     constructor() {
         super(
             'gameplay',
@@ -61,14 +64,15 @@ export default class Gameplay extends Phaser.Scene {
         this.load.image('sred', 'assets/stone-red.png');
         this.load.image('syellow', 'assets/stone-yellow.png');
         this.load.image('placement', 'assets/meteor-placement.png');
+        this.load.image('btn_pause', 'assets/pause.png');
 
 
         this.load.json('level0', 'level/level0.json');
         this.load.json('level1', 'level/level1.json');
     }
 
-    init(data: any) {
-        this.lives = data.lives != undefined ? data.lives : 3;
+    init() {
+        this.lives = 3;
 
     }
     // percent value
@@ -89,11 +93,14 @@ export default class Gameplay extends Phaser.Scene {
         this.isWin = false;
         this.bigBlackHole = null;
         this.setupHealth(this.lives)
+        this.setupPuaseButton()
 
-        this.dataLevel = this.cache.json.get('level1');
+
+        this.dataStorage = new Data();
+        this.dataLevel = this.cache.json.get('level0');
 
         this.width = this.sys.game.scale.gameSize.width;
-        this.height = this.sys.game.scale.gameSize.height * this.dataLevel.world.scale;
+        this.height = this.sys.game.scale.gameSize.height * 3;
 
 
 
@@ -107,33 +114,53 @@ export default class Gameplay extends Phaser.Scene {
 
 
 
-        this.setupObstacle(this.location.getRandomObstacle(2));
-        this.setupPortal(this.location.getRandomWithCount(1));
-        this.setupBlackHole(this.location.getRandomWithCount(5));
-        this.setupMeteors(this.location.getRandomWithCount(10));
-        this.setupPowers(this.location.getRandomWithCount(1), "sblue");
-        this.setupPowers(this.location.getRandomWithCount(2), "sred");
-        this.setupPowers(this.location.getRandomWithCount(3), "sgreen");
-        this.setupPowers(this.location.getRandomWithCount(4), "syellow");
-        this.setupPowers(this.location.getRandomWithCount(5), "sbrown");
+        if (this.dataStorage.isTutorialCompleted()) {
+
+            this.setupByLevel(this.dataStorage.getLevel());
+        } else {
+            this.setupObstacle(this.location.getRandomObstacle(1));
+            this.setupPortal(this.location.getRandomWithCount(1));
+            this.setupPowers(this.location.getRandomWithCount(3), "sblue");
+        }
 
 
 
 
-        this.add.text(this.width / 2 - 50, 20, this.dataLevel.level.title, { fontSize: 20, align: 'center', fontFamily: 'painter', color: '#dfd8c8' }).setDepth(10).setScrollFactor(0);
+        this.add.text(this.width / 2 - 50, 20, "World " + this.dataStorage.getLevel(), { fontSize: 40, align: 'center', fontFamily: 'painter', color: '#dfd8c8' }).setDepth(10).setScrollFactor(0);
         this.ship = new Ship(this, this.location, 10, this.width, this.height);
+        this.scoreText = this.add.text(this.width / 2 + 30, 63, this.dataStorage.getScore().toString(), { fontSize: 30, align: 'left', fontFamily: 'painter', color: '#dfd8c8' }).setDepth(10).setScrollFactor(0);
+
 
         this.ship.placementContainer = this.placementContainer
         this.ship.onHit = () => {
             this.lives -= 1;
             this.setupHealth(this.lives)
         }
+        this.ship.onUpdateScore = (type: string) => {
+            let score = this.dataStorage.getScore();
+            if (type == "sblue")
+                score += 5;
+            else if (type == "sbrown")
+                score += 15;
+            else if (type == "sgreen")
+                score += 25;
+            else if (type == "sred")
+                score += 45;
+            else if (type == "syellow")
+                score += 55;
+
+            this.dataStorage.addScore(score);
+            if (this.scoreText != null) {
+                this.scoreText.setText(this.dataStorage.getScore().toString());
+            }
+        }
 
         this.ship.onHitPortal = () => {
+            this.dataStorage.addLevel();
             this.restart()
         }
 
-        this.ship.setDirectionDegress(this.dataLevel.player.direction);
+        this.ship.setDirectionDegress(-90);
         this.line = new Line(this,
             (power, angle) => {
                 this.ship.setShipAngle(power, angle)
@@ -153,13 +180,59 @@ export default class Gameplay extends Phaser.Scene {
         this.minimap.powers = this.powers;
 
         this.minimap.addShip(this.ship);
-        this.setupTextBox();
+        if (!this.dataStorage.isTutorialCompleted()) {
+
+
+            this.setupTextBox();
+            this.dataStorage.completeTutorial();
+        }
 
 
         // var textBox = new TextBox(this, 400, 800)
         // textBox.typingText("Agus", "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis ornare ac felis eu maximus. Vestibulum non odio ipsum. Fusce placerat placerat lorem. Aliquam lacinia justo nec ligula suscipit sagittis. Mauris vitae lectus vitae nibh semper sodales. Vestibulum massa tellus, eleifend id tortor ac, mollis tempor nisl. Vivamus iaculis ex non lectus suscipit, scelerisque cursus velit rutrum. Nullam eget varius augue, efficitur lobortis est. Praesent at scelerisque quam. In hac habitasse platea dictumst. Aliquam faucibus dolor dignissim augue venenatis, non dictum orci posuere. Vestibulum maximus ex urna, id sodales tellus venenatis volutpat.")
 
     }
+    setupByLevel(level: number) {
+        const obstacleCount = this.scaleLevelGame(level, 1, 0.4, 1, 6);
+        const portalCount = this.scaleLevelGame(level, 1, 0.15, 1, 3);
+
+        const blackHoleCount = this.scaleLevelGame(level, 2, 0.6, 1, 10);
+        const meteorCount = this.scaleLevelGame(level, 6, 1.2, 5, 25);
+
+        const powerBlue = this.scaleLevelGame(level, 3, -0.2, 1, 3);
+        const powerRed = this.scaleLevelGame(level, 2, -0.15, 1, 2);
+        const powerGreen = this.scaleLevelGame(level, 2, -0.15, 1, 2);
+        const powerYellow = this.scaleLevelGame(level, 1, -0.1, 1, 1);
+        const powerBrown = this.scaleLevelGame(level, 2, -0.15, 1, 2);
+
+        // APPLY
+        this.setupObstacle(this.location.getRandomObstacle(obstacleCount));
+        this.setupPortal(this.location.getRandomWithCount(portalCount));
+
+        this.setupBlackHole(this.location.getRandomWithCount(blackHoleCount));
+        this.setupMeteors(this.location.getRandomWithCount(meteorCount));
+
+        this.setupPowers(this.location.getRandomWithCount(powerBlue), "sblue");
+        this.setupPowers(this.location.getRandomWithCount(powerRed), "sred");
+        this.setupPowers(this.location.getRandomWithCount(powerGreen), "sgreen");
+        this.setupPowers(this.location.getRandomWithCount(powerYellow), "syellow");
+        this.setupPowers(this.location.getRandomWithCount(powerBrown), "sbrown");
+    }
+    scaleLevelGame(
+        level: number,
+        base: number,
+        growth: number,
+        min: number,
+        max: number
+    ) {
+        const value = base + level * growth;
+        return Phaser.Math.Clamp(
+            Phaser.Math.Between(value - 1, value + 1),
+            min,
+            max
+        );
+    }
+
     setupTextBox() {
         this.scene.launch('textboxscene', {
             'dataLevel': this.dataLevel,
@@ -175,11 +248,14 @@ export default class Gameplay extends Phaser.Scene {
     loseCondition() {
 
         this.scene.setActive(false, this)
-        this.scene.launch('losegui', {
-            'dataLevel': this.dataLevel
-        })
+        this.scene.launch('losegui')
         this.loseGuiScene = this.scene.get('losegui')
 
+    }
+    pauseCondition() {
+        this.scene.setActive(false, this)
+        this.scene.pause('gameplay')
+        this.scene.launch('pausegui')
     }
     restart() {
         this.scene.stop('losegui')
@@ -213,7 +289,7 @@ export default class Gameplay extends Phaser.Scene {
 
                     this.destroyAll()
 
-                    this.bigBlackHole = new BigBlackHole(this, this.dataLevel.portal.x, this.dataLevel.portal.y)
+                    this.bigBlackHole = new BigBlackHole(this, this.width / 2, this.height / 2);
                     this.bigBlackHole.addObject(this.ship);
 
                     this.isEnding = true;
@@ -359,6 +435,15 @@ export default class Gameplay extends Phaser.Scene {
             this.healthImages.push(image);
             startPosX += space;
         }
+    }
+    setupPuaseButton() {
+        this.add.image(50, 80, 'btn_pause').setScrollFactor(0).setScale(0.3).setInteractive()
+            .setScale(0.2)
+            .setInteractive()
+            .on('pointerdown', () => {
+                console.log('game paused')
+                this.pauseCondition()
+            })
     }
     setupStar() {
         const star = this.add.image(Phaser.Math.Between(0, this.width), Phaser.Math.Between(0, this.height), 'star').setVisible(false)

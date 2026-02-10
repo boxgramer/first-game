@@ -107,6 +107,7 @@ export default class Location {
 
     }
     getRandomWithCount(count: number): pos[] {
+        count = Phaser.Math.Clamp(count, 0, this.positions.length);
         const selectedPositions: pos[] = [];
         for (let i = 0; i < count; i++) {
             if (this.positions.length === 0) {

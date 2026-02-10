@@ -30,18 +30,33 @@
   "stars": [],
   "textboxs": [
     {
-      "who": "Agus",
+      "who": "developer",
       "texts": [
-        " text 1  agus  lorem ipsum 1 ? ",
-        " agus text 2  lorem ipsum 2 ? "
+        "Welcome, pilot! Let me show you how to control your ship.",
+        "To move the ship, click and drag on the screen, then release to launch it toward your target."
       ]
     },
     {
-      "who": "Rimba",
+      "who": "developer",
       "texts": [
-        " text rimba  1  lorem ipsum rimba  1 ? ",
-        " text rimba  2 rimba  lorem ipsum 2 ? "
+        "Your main goal is to collect as many points as possible.",
+        "Aim carefully and plan your movement to maximize your score."
+      ]
+    },
+    {
+      "who": "developer",
+      "texts": [
+        "Each world is connected by constellations in space.",
+        "To move to the next world, crash your ship into all  constellations."
+      ]
+    },
+    {
+      "who": "developer",
+      "texts": [
+        "Good luck, pilot!",
+        "Master your control, chase the stars, and reach the highest score."
       ]
     }
   ]
+
 }

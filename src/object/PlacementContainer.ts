@@ -4,7 +4,7 @@ import Placement from "./Placement";
 export default class PlacementContainer {
     x: number;
     y: number;
-    count: number = 5;
+    count: number = 1;
     width: number = 50;
     scene: Phaser.Scene;
     placements: Array<Placement> = [];
@@ -28,23 +28,24 @@ export default class PlacementContainer {
     }
 
     getEmptyPlacement(type: string) {
-        for (let i = 0; i < this.placements.length; i++) {
+        return this.placements.find(p => p.collected == null) || null;
+        // for (let i = 0; i < this.placements.length; i++) {
 
 
-            if (this.placements[i].collected == type) {
+        //     if (this.placements[i].collected == type) {
 
-                return null;
-            }
-        }
-        for (let i = 0; i < this.placements.length; i++) {
-            if (this.placements[i].collected == null) {
-                this.placements[i].collected = type;
-                return this.placements[i];
-            }
-        }
+        //         return null;
+        //     }
+        // }
+        // for (let i = 0; i < this.placements.length; i++) {
+        //     if (this.placements[i].collected == null) {
+        //         this.placements[i].collected = type;
+        //         return this.placements[i];
+        //     }
+        // }
 
 
-        return null
+        // return null
     }
 
 

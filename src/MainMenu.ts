@@ -1,5 +1,6 @@
 import Phaser from "phaser";
 import TextBox from "./object/TextBox";
+import { Data } from "./utils/Data";
 
 export default class MainMenu extends Phaser.Scene {
 
@@ -22,29 +23,31 @@ export default class MainMenu extends Phaser.Scene {
         var height = this.sys.game.scale.height;
         this.setupStar(width, height)
         this.setupRandomMeteor(width, height)
+        const dataStorage = new Data()
 
         var title = this.add.image(width / 2, height * 0.3, 'title')
             .setScale(0.3)
-        var btnNewGame = this.add.image(width / 2, height * 0.6, 'btn_newgame')
+
+        var posHeightNewGame = height * 0.6;
+        if (dataStorage.isTutorialCompleted()) {
+            posHeightNewGame = height * 0.75;
+        }
+
+        var btnNewGame = this.add.image(width / 2, posHeightNewGame, 'btn_newgame')
             .setScale(0.3)
             .setInteractive()
             .on('pointerdown', () => {
-                this.scene.launch('gameplay', { 'lives': '3' })
+                dataStorage.reset();
+                this.scene.launch('gameplay')
                 this.scene.stop('mainmenu')
             })
         var btnContinue = this.add.image(width / 2, height * 0.6, 'btn_continue')
             .setScale(0.3)
-            .setVisible(false)
+            .setVisible(dataStorage.isTutorialCompleted())
             .setInteractive()
             .on('pointerdown', () => {
-                console.log("continues")
-            })
-
-        var btnSetting = this.add.image(width / 2, height * 0.75, 'btn_setting')
-            .setScale(0.3)
-            .setInteractive()
-            .on('pointerdown', () => {
-                console.log('settng open')
+                this.scene.launch('gameplay')
+                this.scene.stop('mainmenu')
             })
 
 

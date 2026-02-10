@@ -4,6 +4,7 @@ import Gameplay from './Gameplay'
 import LoseGUI from './LoseGUI'
 import MainMenu from './MainMenu'
 import TextBoxScene from './TextBoxScene'
+import PauseGUI from './PauseGUI'
 
 const config: Phaser.Types.Core.GameConfig = {
 	type: Phaser.AUTO,
@@ -20,7 +21,7 @@ const config: Phaser.Types.Core.GameConfig = {
 		}
 
 	},
-	scene: [MainMenu, Gameplay, LoseGUI, TextBoxScene],
+	scene: [MainMenu, Gameplay, LoseGUI, PauseGUI, TextBoxScene],
 	render: {
 		antialias: true,
 	}

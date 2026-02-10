@@ -49,26 +49,22 @@ export default class TextBox extends Phaser.GameObjects.Container {
         this.targetTexts = targetText;
         this.targetWho = targetWho;
 
-        // this.scene.add.zone(this.getTopLeft().x! + 15, this.getTopLeft().y! + 38, 560, 110)
-        //     .setInteractive()
-        //     .on("pointermove", (p: any) => {
-        //         if (p.isDown) {
-        //             this.text.y += p.velocity.y / 10;
-        //             this.text.y = Phaser.Math.Clamp(this.text.y, -110, 110)
-        //         }
-        //     })
+        this.index = 0;
 
-        this.bg.setInteractive().on('pointerdown', () => {
-            this.startTyping(this.index)
 
-        })
+    }
+    nextTyping() {
 
+        this.startTyping(this.index)
     }
     update() {
         this.graphics.clear();
         this.graphics.fillRect(this.x - 270, this.y - 45, 543, 110);
 
 
+    }
+    getIndex(): number {
+        return this.index;
     }
     startTyping(index: number = 0) {
         this.index = index;

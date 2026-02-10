@@ -4,23 +4,25 @@ export default class LoseGUI extends Phaser.Scene {
 
     card: Phaser.GameObjects.Image | null = null;
     btnHome: Phaser.GameObjects.Image | null = null;
-    btnRestart: Phaser.GameObjects.Image | null = null;
+    btnContinue: Phaser.GameObjects.Image | null = null;
+    dataLevel: any;
     width: number = 0.0;
     height: number = 0.0;
     gameScene: Phaser.Scene | null = null
 
     constructor() {
-        super({ key: 'losegui', 'active': false })
+        super({ key: 'pausegui', 'active': false })
     }
     preload() {
 
         this.load.image('card', 'assets/card.png');
         this.load.image('btn_home', 'assets/btn_home.png');
-        this.load.image('btn_restart', 'assets/btn_restart.png');
+        this.load.image('btn_continue', 'assets/btnContinue.png');
 
 
     }
-    init() {
+    init(data: any) {
+        this.dataLevel = data.dataLevel;
     }
 
 
@@ -42,16 +44,16 @@ export default class LoseGUI extends Phaser.Scene {
             ease: 'sine.out'
 
         })
-        this.btnRestart = this.add.image(this.width / 2, (this.height * 0.55) - targetTweenHeight, 'btn_restart')
+        this.btnContinue = this.add.image(this.width / 2, (this.height * 0.55) - targetTweenHeight, 'btn_continue')
             .setScale(0.3)
             .setInteractive()
             .on('pointerdown', () => {
-                console.log('restart')
-                this.scene.stop('losegui')
-                this.scene.start('gameplay')
+                console.log('continue')
+                this.scene.stop('pausegui')
+                this.scene.resume('gameplay')
             })
         this.tweens.add({
-            targets: this.btnRestart,
+            targets: this.btnContinue,
             y: this.height * 0.55,
             duration: 500,
             ease: 'sine.out'
@@ -74,7 +76,7 @@ export default class LoseGUI extends Phaser.Scene {
             ease: 'sine.out'
 
         })
-        var text = this.add.text(this.width / 2, (this.height * 0.3) - targetTweenHeight, "You Lose", { fontFamily: 'painter', fontSize: 50, color: '#dfd8c8' }).setOrigin(0.5)
+        var text = this.add.text(this.width / 2, (this.height * 0.3) - targetTweenHeight, "Game Paused", { fontFamily: 'painter', fontSize: 50, color: '#dfd8c8' }).setOrigin(0.5)
         this.tweens.add({
             targets: text,
             y: this.height * 0.3,
