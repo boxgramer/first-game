@@ -36,5 +36,5 @@ npm start
 ### 1️⃣ Images 
 
 ![DreamerSpace1](./screenshoot/ss1.png)
-![DreamerSpace2](./screenshoot/ss2.png)
+![DreamerSpace3](./screenshoot/ss2.png)
 
