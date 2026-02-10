@@ -15,8 +15,7 @@ Crash into constellations to move to the next world and keep your journey going 
 
 - 2D endless space adventure gameplay  
 - Click & drag ship movement  
-- Score-based progression  
-- World-to-world travel through constellations  
+- Score-based progression    
 - Increasing difficulty over time  
 
 ---
