@@ -1,114 +1,41 @@
-# Phaser 3 + TypeScript + Vite.js Template
-> Make Phaser 3 games with TypeScript and modern frontend tooling.
+# 🌌 DreamerSpace
 
-![License](https://img.shields.io/badge/license-MIT-green)
+![DreamerSpace](./screenshoot/ss3.png)
 
-This is a TypeScript specific fork of [phaser3-vite-template](https://github.com/ourcade/phaser3-vite-template).
+## 🚀 Description
 
-## Prerequisites
+**DreamerSpace** is a **2D endless space adventure game** where players control a spaceship, explore the universe, and collect as many points as possible.
 
-You'll need [Node.js](https://nodejs.org/en/) and [npm](https://www.npmjs.com/) installed.
+Move your ship by clicking and dragging, aim toward your destination, and travel through space.  
+Crash into constellations to move to the next world and keep your journey going as long as you can.
 
-It is highly recommended to use [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) to install Node.js and npm.
+---
 
-For Windows users there is [Node Version Manager for Windows](https://github.com/coreybutler/nvm-windows).
+## 🎮 Game Features
 
-Install Node.js and `npm` with `nvm`:
+- 2D endless space adventure gameplay  
+- Click & drag ship movement  
+- Score-based progression  
+- World-to-world travel through constellations  
+- Increasing difficulty over time  
 
+---
+
+## ⚙️ How to Setup
+
+Make sure you have **Node.js** installed on your machine.
+
+### 1️⃣ Install dependencies
 ```bash
-nvm install node
-
-nvm use node
-```
-
-Replace 'node' with 'latest' for `nvm-windows`.
-
-## Getting Started
-
-You can clone this repository or use [degit](https://github.com/Rich-Harris/degit) to scaffold the project like this:
-
-```bash
-npx degit https://github.com/ourcade/phaser3-typescript-vite-template my-folder-name
-cd my-folder-name
-
 npm install
 ```
 
-Start development server:
-
-```
-npm run start
+```bash
+npm start
 ```
 
-To create a production build:
+### 1️⃣ Images 
 
-```
-npm run build
-```
+![DreamerSpace1](./screenshoot/ss1.png)
+![DreamerSpace2](./screenshoot/ss2.png)
 
-Production files will be placed in the `dist` folder. Then upload those files to a web server. 🎉
-
-## Project Structure
-
-```
-    .
-    ├── dist
-    ├── node_modules
-    ├── public
-    ├── src
-    │   ├── HelloWorldScene.ts
-    │   ├── main.ts
-	├── index.html
-    ├── package.json
-```
-
-TypeScript files are intended for the `src` folder. `main.ts` is the entry point referenced by `index.html`.
-
-Other than that there is no opinion on how you should structure your project.
-
-There is an example `HelloWorldScene.ts` file that can be placed inside a `scenes` folder to organize by type or elsewhere to organize by function. For example, you can keep all files specific to the HelloWorld scene in a `hello-world` folder.
-
-It is all up to you!
-
-## Static Assets
-
-Any static assets like images or audio files should be placed in the `public` folder. It'll then be served from the root. For example: http://localhost:8000/images/my-image.png
-
-Example `public` structure:
-
-```
-    public
-    ├── images
-    │   ├── my-image.png
-    ├── music
-    │   ├── ...
-    ├── sfx
-    │   ├── ...
-```
-
-They can then be loaded by Phaser with `this.image.load('my-image', 'images/my-image.png')`.
-
-# TypeScript ESLint
-
-This template uses a basic `typescript-eslint` set up for code linting.
-
-It does not aim to be opinionated.
-
-[See here for rules to turn on or off](https://eslint.org/docs/rules/).
-
-## Dev Server Port
-
-You can change the dev server's port number by modifying the `vite.config.ts` file. Look for the `server` section:
-
-```js
-{
-	// ...
-	server: { host: '0.0.0.0', port: 8000 },
-}
-```
-
-Change 8000 to whatever you want.
-
-## License
-
-[MIT License](https://github.com/ourcade/phaser3-vite-template/blob/master/LICENSE)
