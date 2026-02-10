@@ -9,12 +9,15 @@ export default class Obstacle {
     fx: Phaser.FX.Glow;
     isGlow: boolean = false;
     name: string;
+    points!: Array<number>;
 
-    constructor(scene: Phaser.Scene, points: Array<number>, worldWidth: number, worldHeight: number, name: string = 'obstacle', isGlow: boolean = false) {
+    constructor(scene: Phaser.Scene, points: Array<number>, name: string = 'obstacle', isGlow: boolean = false) {
         this.scene = scene;
         this.name = name;
+        this.points = points;
 
-        this.polygon = new Phaser.Geom.Polygon(this.convertPoint(points, worldWidth, worldHeight));
+        // this.polygon = new Phaser.Geom.Polygon(this.convertPoint(points, worldWidth, worldHeight));
+        this.polygon = new Phaser.Geom.Polygon(this.points);
         this.graphics = this.scene.add.graphics();
         this.graphics.setDepth(1);
         this.fx = this.graphics.postFX.addGlow(0xA0E7E5, 0, 0, false, 0.1, 24);

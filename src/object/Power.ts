@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 
-export default class Star extends Phaser.GameObjects.Image {
+export default class Power extends Phaser.GameObjects.Image {
 
 
     type: string;

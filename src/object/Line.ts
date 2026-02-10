@@ -5,8 +5,8 @@ export default class Line {
     scene: Phaser.Scene;
     graphic: Phaser.GameObjects.Graphics;
 
-    startPoint: Phaser.Math.Vector2 | null = null;
-    currentPoint: Phaser.Math.Vector2 | null = null;
+    startPoint: Phaser.Math.Vector2 | null = Phaser.Math.Vector2.ZERO;
+    currentPoint: Phaser.Math.Vector2 | null = Phaser.Math.Vector2.ZERO;
     isClick: boolean = false;
     power: number = 0;
     maxPower: number = 100;

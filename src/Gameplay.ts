@@ -6,8 +6,9 @@ import BigBlackHole from "./object/BigBlackHole";
 import MiniMap from "./object/MiniMap";
 import Meteor from "./object/Meteor";
 import TextBox from "./object/TextBox";
-import Star from "./object/star";
+import Power from "./object/Power";
 import PlacementContainer from "./object/PlacementContainer";
+import Location, { pos } from "./utils/Location";
 
 
 export default class Gameplay extends Phaser.Scene {
@@ -19,11 +20,12 @@ export default class Gameplay extends Phaser.Scene {
     graphic!: Phaser.GameObjects.Graphics;
     twisters: Array<BlackHole> = [];
     meteors: Array<Meteor> = [];
-    stars: Array<Star> = [];
+    powers: Array<Power> = [];
     placementContainer: PlacementContainer | null = null;
     bigBlackHole: BigBlackHole | null = null;
     healthImages: Array<Phaser.GameObjects.Image> = []
     minimap!: MiniMap;
+    location!: Location;
 
 
 
@@ -88,12 +90,14 @@ export default class Gameplay extends Phaser.Scene {
         this.bigBlackHole = null;
         this.setupHealth(this.lives)
 
-        this.dataLevel = this.cache.json.get('level0');
+        this.dataLevel = this.cache.json.get('level1');
 
         this.width = this.sys.game.scale.gameSize.width;
         this.height = this.sys.game.scale.gameSize.height * this.dataLevel.world.scale;
 
 
+
+        this.location = new Location(this, this.width, this.height, false)
 
 
 
@@ -101,19 +105,28 @@ export default class Gameplay extends Phaser.Scene {
 
         this.setupStar()
 
-        this.setupTwister(this.dataLevel.blackHoles);
-        this.setupObstacle(this.dataLevel.obstacles);
-        this.setupMeteors(this.dataLevel.meteors);
-        this.setupStars(this.dataLevel.stars);
+
+
+        this.setupObstacle(this.location.getRandomObstacle(2));
+        this.setupPortal(this.location.getRandomWithCount(1));
+        this.setupBlackHole(this.location.getRandomWithCount(5));
+        this.setupMeteors(this.location.getRandomWithCount(10));
+        this.setupPowers(this.location.getRandomWithCount(1), "sblue");
+        this.setupPowers(this.location.getRandomWithCount(2), "sred");
+        this.setupPowers(this.location.getRandomWithCount(3), "sgreen");
+        this.setupPowers(this.location.getRandomWithCount(4), "syellow");
+        this.setupPowers(this.location.getRandomWithCount(5), "sbrown");
+
+
+
 
         this.add.text(this.width / 2 - 50, 20, this.dataLevel.level.title, { fontSize: 20, align: 'center', fontFamily: 'painter', color: '#dfd8c8' }).setDepth(10).setScrollFactor(0);
-        this.ship = new Ship(this, new Phaser.Math.Vector2(this.convertX(this.dataLevel.player.x), this.convertY(this.dataLevel.player.y)), 10, this.width, this.height);
+        this.ship = new Ship(this, this.location, 10, this.width, this.height);
 
         this.ship.placementContainer = this.placementContainer
         this.ship.onHit = () => {
             this.lives -= 1;
             this.setupHealth(this.lives)
-            this.ship.setToStart()
         }
 
         this.ship.onHitPortal = () => {
@@ -133,10 +146,11 @@ export default class Gameplay extends Phaser.Scene {
         this.line.start();
 
         this.setupCamera();
-        this.minimap = new MiniMap(this, this.dataLevel, this.width, this.height)
+        this.minimap = new MiniMap(this, this.width, this.height)
+        this.minimap.setObstacle(this.obstacles);
         this.minimap.meteors = this.meteors;
         this.minimap.blackHoles = this.twisters;
-        this.minimap.stars = this.stars;
+        this.minimap.powers = this.powers;
 
         this.minimap.addShip(this.ship);
         this.setupTextBox();
@@ -224,15 +238,15 @@ export default class Gameplay extends Phaser.Scene {
         this.ship.colideWithObstacles(this.obstacles)
         this.ship.collideWithBlackHole(this.twisters)
         this.ship.collideWithMeteors(this.meteors)
-        this.ship.collideWithStar(this.stars)
+        this.ship.collideWithStar(this.powers)
 
         this.ship.update(time, delta);
         this.line.update();
         this.obstacles.forEach(obstacles => {
             obstacles.update();
         })
-        this.stars.forEach(s => {
-            s.update();
+        this.powers.forEach(p => {
+            p.update();
         })
 
 
@@ -271,8 +285,9 @@ export default class Gameplay extends Phaser.Scene {
     }
 
     setupObstacle(obstacles: Array<any>) {
+        console.log(obstacles);
         obstacles.forEach(ob => {
-            const obstacle = new Obstacle(this, ob.points, this.width, this.height, ob.name, false);
+            const obstacle = new Obstacle(this, ob.points, ob.name, false);
             this.obstacles.push(obstacle);
         })
     }
@@ -292,10 +307,20 @@ export default class Gameplay extends Phaser.Scene {
         })
 
     }
-    setupTwister(blackHole: Array<any>) {
+    setupBlackHole(blackHole: Array<pos>) {
 
         blackHole.forEach(b => {
-            const blackHole = new BlackHole(this, this.convertX(b.x), this.convertY(b.y), b.type);
+            const blackHole = new BlackHole(this, b.x, b.y, "twister");
+
+            this.twisters.push(blackHole);
+        })
+
+
+    }
+    setupPortal(portals: Array<pos>) {
+
+        portals.forEach(b => {
+            const blackHole = new BlackHole(this, b.x, b.y, "portal");
 
             this.twisters.push(blackHole);
         })
@@ -304,15 +329,15 @@ export default class Gameplay extends Phaser.Scene {
     }
     setupMeteors(meteor: Array<any>) {
         meteor.forEach(m => {
-            const metorit = new Meteor(this, this.convertX(m.x), this.convertY(m.y), m.radius)
+            const metorit = new Meteor(this, m.x, m.y, m.radius)
             this.meteors.push(metorit)
 
         })
     }
-    setupStars(stars: Array<any>) {
-        stars.forEach(s => {
-            const star = new Star(this, this.convertX(s.x), this.convertY(s.y), s.type);
-            this.stars.push(star)
+    setupPowers(powers: Array<any>, texture: string = "sblue") {
+        powers.forEach(s => {
+            const power = new Power(this, s.x, s.y, texture);
+            this.powers.push(power)
         })
     }
     removeAllHealtImage() {

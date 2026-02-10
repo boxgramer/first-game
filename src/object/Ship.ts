@@ -2,8 +2,9 @@ import Phaser, { Tweens } from "phaser";
 import Obstacle from "./Obstacle";
 import BlackHole from "./BlackHole";
 import Meteor from "./Meteor";
-import Star from "./star";
+import Star from "./Power";
 import PlacementContainer from "./PlacementContainer";
+import Location from "../utils/Location";
 
 export default class Ship extends Phaser.GameObjects.Sprite {
 
@@ -32,13 +33,18 @@ export default class Ship extends Phaser.GameObjects.Sprite {
     fire: Phaser.GameObjects.Particles.ParticleEmitter | null = null;
     firePosMarginY: number = 30;
     fireAnggleRange: number = 100;
+    location!: Location;
 
 
-    constructor(scene: Phaser.Scene, point: Phaser.Math.Vector2, radius: number = 50, maxWorldWidth: number = 800, maxWorldHeight: number = 600) {
+    constructor(scene: Phaser.Scene, location: Location, radius: number = 50, maxWorldWidth: number = 800, maxWorldHeight: number = 600) {
+        const point = location.getRandomPosition();
+
         super(scene, point.x, point.y, 'ship')
         this.scene = scene;
-        this.startPosition = point.clone();
-        this.point = point;
+
+        this.location = location;
+        this.point = new Phaser.Math.Vector2(point.x, point.y);
+        this.startPosition = new Phaser.Math.Vector2(point.x, point.y); // save start point
         this.radius = radius;
         this.graphics = this.scene.add.graphics();
         this.circle = new Phaser.Geom.Circle(this.point.x, this.point.y, this.radius);
@@ -144,7 +150,8 @@ export default class Ship extends Phaser.GameObjects.Sprite {
 
     }
     setToStart() {
-        this.point = this.startPosition.clone();
+        const p = this.location.getRandomPosition();
+        this.point = new Phaser.Math.Vector2(p.x, p.y);
 
     }
     meteorHitEffect(callback: () => void) {
@@ -163,7 +170,9 @@ export default class Ship extends Phaser.GameObjects.Sprite {
             yoyo: true,
             delay: 300,
         })
-        blinkBefore.on('complete', callback)
+        blinkBefore.on('complete', () => {
+            callback()
+        })
         blinkAfter.on('complete', () => {
             this.isHit = false;
             this.setAlpha(1)
@@ -181,7 +190,12 @@ export default class Ship extends Phaser.GameObjects.Sprite {
             repeat: 3,
             yoyo: true,
         })
-        blinkAfter.on('start', callback)
+        blinkAfter.on('start', () => {
+            callback()
+
+            this.setToStart()
+
+        })
         blinkAfter.on('complete', () => {
             this.graphics.setVisible(true)
             this.isHit = false;

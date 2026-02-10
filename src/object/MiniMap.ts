@@ -4,7 +4,7 @@ import Ship from "./Ship";
 import Meteor from "./Meteor";
 import Obstacle from "./Obstacle";
 import BlackHole from "./BlackHole";
-import Star from "./star";
+import Power from "./Power";
 export default class MiniMap extends Phaser.GameObjects.Graphics {
     x: number = 0;
     y: number = 0;
@@ -12,20 +12,18 @@ export default class MiniMap extends Phaser.GameObjects.Graphics {
     height: number = 100;
     worldWidth: number = 0;
     worldHeight: number = 0;
-    dataLevel: any;
     obstacles: Array<Phaser.Geom.Polygon> = []
     blackHoles: Array<BlackHole> = []
     meteors: Array<Meteor> = []
-    stars: Array<Star> = []
+    powers: Array<Power> = []
 
     ship: Ship | null = null;
     isWin: boolean = false;
     widthCamera: number = 0;
     heightCamera: number = 0;
-    constructor(scene: Phaser.Scene, dataLevel: any, worldWidth: number, worldHeight: number) {
+    constructor(scene: Phaser.Scene, worldWidth: number, worldHeight: number) {
         super(scene);
         this.scene.add.existing(this);
-        this.dataLevel = dataLevel;
         this.setScrollFactor(0);
         this.setDepth(10);
         this.widthCamera = this.scene.sys.game.scale.gameSize.width;
@@ -39,7 +37,6 @@ export default class MiniMap extends Phaser.GameObjects.Graphics {
         this.x = (this.widthCamera / 2) - ((this.width / 2) + 5)
         this.y = 5;
 
-        this.setupObstacle();
         // this.setupBlackHoles();
     }
 
@@ -77,7 +74,7 @@ export default class MiniMap extends Phaser.GameObjects.Graphics {
                 this.fillCircle(this.convertX(m.x), this.convertY(m.y), 5)
             }
         })
-        this.stars.forEach(s => {
+        this.powers.forEach(s => {
             if (!s.isHit) {
                 if (s.type == 'sblue') {
                     //c8e8ed
@@ -104,8 +101,8 @@ export default class MiniMap extends Phaser.GameObjects.Graphics {
             }
         })
     }
-    setupObstacle() {
-        this.dataLevel.obstacles.forEach((ob: any) => {
+    setObstacle(obstacles: Array<Obstacle>) {
+        obstacles.forEach((ob: Obstacle) => {
             const points: Array<number> = [];
             ob.points.forEach((p: number, i: number) => {
                 if ((i + 1) % 2 == 0) {
